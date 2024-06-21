@@ -101,8 +101,7 @@ new_folder.remove() # Remove the file
 new_folder.create_file("name_of_file.txt") # Create a file inside folder\
 new_folder.make_file("name_of_file.txt") # Make a file inside folder
 
-new_folder.copy("test_folder/fun_file.txt") # Copy file to parameter's location\
-new_folder.copy_and_rename("test_folder/fun_file.txt") # Copy file to parameter's location
+new_folder.copy_to("test_folder/fun_file.txt") # Copy file to parameter's location\
 
 new_folder.list() # Returns a list of all files in folder object
 
