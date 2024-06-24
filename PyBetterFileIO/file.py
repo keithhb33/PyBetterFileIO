@@ -11,16 +11,16 @@ class file:
             self.edit = self.edit(self)
 
     def exists(self):
-        try:
-            return os.path.isfile(self.filename):
-        except Exception as e:
-            print(f"An error occured checking if {self.filename} exists")
-
+        #try:
+        return os.path.isfile(self.filename)
+        #except Exception as e:
+        #    print(f"An error occured checking if {self.filename} exists")
 
     def rename(self, new_filename):
         try:
-            os.rename(filename, new_filename)
-            self.filename = new_filename
+            if self.exists():
+                os.rename(filename, new_filename)
+                self.filename = new_filename
             return self
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
@@ -32,7 +32,6 @@ class file:
     def delete(self):
         try:
             os.remove(self.filename)
-            self.filename = None
             return self
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
@@ -43,8 +42,7 @@ class file:
 
     def remove(self):
         try:
-            os.remove(self.filename)
-            self.filename = None
+            self.delete()
             return self
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
@@ -55,8 +53,8 @@ class file:
 
     def make(self):
         try:
-            if os.path.isfile(self.filename):
-                print(f"File {self.filename} already exists...continuing...")
+            if self.exists():
+                #print(f"File {self.filename} already exists...continuing...")
                 return self
             f = open(self.filename, 'w')
             f.close()
@@ -68,9 +66,7 @@ class file:
 
     def create(self):
         try:
-            f = open(self.filename, 'w')
-            f.close()
-            return self
+            self.make()
         except PermissionError:
             print(f"Permission denied while creating {self.filename}")
         except Exception as e:
@@ -92,6 +88,17 @@ class file:
         try:
             with open(self.filename, 'r', encoding="utf8") as file:
                 return str(file.read())
+        except FileNotFoundError:
+            print(f"File {self.filename} does not exist at that directory")
+        except PermissionError:
+            print(f"Permission denied while reading {self.filename}")  
+        except Exception as e:
+            print(f"An error occurred while reading {self.filename}")
+
+    def read_list(self):
+        try:
+            with open(self.filename, 'r', encoding="utf8") as file:
+                return list(file.readlines())
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
         except PermissionError:
@@ -122,23 +129,34 @@ class file:
         except Exception as e:
             print(f"An error occurred while writing {append_string} to {self.filename}")
 
-    def move(self, new_location):
+    def move_to(self, new_location):
         try:
-            shutil.move(self.filename, new_location)
-            self.filename = new_location
+            if "." in new_location:
+                if file(new_location).exists():
+                    file(new_location).delete()
+                shutil.move(self.filename, new_location)
+                self.filename = new_location
+            else:
+                path = os.path.join(new_location, self.filename)
+                if file(path).exists():
+                    file(path).delete()
+                shutil.move(self.filename, path)
+                self.filename = path            
             return self
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
         except PermissionError:
             print(f"Permission denied while moving {self.filename} to {new_location}")
         except Exception as e:
-            print(f"An error occurred while writing {self.filename} to {new_location}")
+            print(f"An error occurred while moving {self.filename} to {new_location}")
 
+    def moveTo(self, new_location):
+        return self.move_to(new_location)
 
     def write(self, write_string):
         try:
-            self.edit.clear()
-            self.edit.append(write_string)
+            self.clear()
+            self.append(write_string)
             return self
         except FileNotFoundError:
             print(f"File {self.filename} does not exist at that directory")
@@ -177,13 +195,65 @@ class file:
     #        print(f"An error occured while setting filename to {new_filename}")")
 
     def copy_and_rename(self, new_file_name):
-        shutil.copyfile(self.filename, new_file_name)
-        return self
+        try:
+            shutil.copyfile(self.filename, new_file_name)
+            return self
+        except FileNotFoundError:
+            print(f"File {self.filename} does not exist at that directory")
+        except PermissionError:
+            print(f"Permission denied while copying {self.filename} to {new_filename}")
+        except Exception as e:
+            print(f"An error occurred while copying {self.filename} to {new_filename}")
 
     def copyAndRename(self, newFileName):
-        shutil.copyfile(self.filename, newFileName)
-        return self
+        return self.copy_and_rename(newFileName)
 
+    def copy_to(self, new_location):
+        try:
+            if "." in new_location:
+                if file(new_location).exists():
+                    file(new_location).delete()
+                shutil.copy(self.filename, new_location)
+            else:
+                path = os.path.join(new_location, self.filename)
+                if file(path).exists():
+                    file(path).delete()
+                shutil.copy(self.filename, path)       
+            return self
+        except FileNotFoundError:
+            print(f"File {self.filename} does not exist at that directory")
+        except PermissionError:
+            print(f"Permission denied while moving {self.filename} to {new_location}")
+        except Exception as e:
+            print(f"An error occurred while moving {self.filename} to {new_location}")
+
+    def copyTo(self, newFileName):
+        return self.copy_to(newFileName)
+
+    def get_default_file_object(self):
+        default_file = open(self.filename)
+        return default_file
+
+    def getDefaultFileObject(self):
+        return self.to_default_file_object()
+
+    def get_custom_file_object(self):
+        return file(self.filename)
+
+    def getCustomFileObject(self):
+        return self.get_custom_file_object()
+
+    def clear(self):
+        try:
+            if self.exists():
+                open(self.filename, 'w').close()
+            return self
+        except FileNotFoundError:
+            print(f"File {self.outer_instance.filename} does not exist at that directory")
+        except PermissionError:
+            print(f"Permission denied while clearing {self.outer_instance.filename}")
+        except Exception as e:
+            print(f"An error occurred while clearing {self.outer_instance.filename}")
 
     class edit:
         def __init__(self, outer_instance):
@@ -250,6 +320,16 @@ class file:
         def copyAndRename(self, newFileName):
             shutil.copyfile(self.outerinstance.filename, newFileName)
             return self.outer_instance
+
+        def is_file(self):
+            return os.path.isfile(self.filename)
+
+        def is_folder(self):
+            return os.path.isdir(self.filename)
+
+        
+
+
 
             
             
