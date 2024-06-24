@@ -13,7 +13,7 @@ class folder:
 
     def exists(self):
         try:
-            return os.path.isdir(self.filename):
+            return os.path.isdir(self.filename)
         except Exception as e:
             print(f"An error occured checking if {self.filename} exists")
 
@@ -52,25 +52,12 @@ class folder:
             print(f"An error occured while deleting {self.foldername}")
 
     def remove(self):
-        try:
-            if os.path.isdir(self.foldername):
-                if len(self.foldername) > 0:
-                    self.clear()
-                os.rmdir(self.foldername)
-            if (re.search(r'/.', self.foldername[1:]) or re.search(r'\\.', self.foldername[1:])):
-                self.foldername = self.get_foldername()
-            return self
-        except FileNotFoundError:
-            print(f"Folder/directory {self.foldername} does not exist at that location")
-        except PermissionError:
-            print(f"Permission denied removing {self.foldername}")
-        except Exception as e:
-            print(f"An error occured while removing {self.foldername}")
+        return self.delete()
 
     def make(self):
         try:
             if os.path.isdir(self.foldername):
-                print(f"Folder/directory {self.foldername} already exists...continuing...")
+                #print(f"Folder/directory {self.foldername} already exists...continuing...")
                 return self
             os.makedirs(self.foldername)
             return self
@@ -80,28 +67,35 @@ class folder:
             print(f"An error occured while making {self.foldername}")
 
     def create(self):
-        try:
-            if os.path.isdir(self.foldername):
-                print(f"Folder/directory {self.foldername} already exists...continuing...")
-                return self
-            os.makedirs(self.foldername)
-            return self
-        except PermissionError:
-            print(f"Permission denied while creating {self.foldername}")
-        except Exception as e:
-            print(f"An error occured while creating {self.foldername}")
+        return self.make()
 
-    def copy_to(self, new_foldername):
+    def copy_contents_to(self, new_foldername):
         try:
-            if not os.path.isdir(new_foldername):
-                print(f"{new_foldername} path does not exist. Create a folder/directory to that path before copying")
+            if "." in new_foldername:
                 return self
+            if not os.path.isdir(new_foldername):
+                self.make()
             files = os.listdir(self.foldername)
             for file in files:
                 if os.path.isfile(os.path.join(self.foldername, file)):
                     shutil.copy(os.path.join(self.foldername, file), new_foldername)
                 elif os.path.isdir(os.path.join(self.foldername, file)):
                     shutil.copytree(os.path.join(self.foldername, new_foldername))
+            return self
+        except FileNotFoundError:
+            print(f"Folder/directory {self.foldername} does not exist at that directory")
+        except PermissionError:
+            print(f"Permission denied while copying {self.foldername}")
+        except Exception as e:
+            print(f"An error occured while copying {self.foldername} to {new_foldername}")
+            print("Enter a new directory, including the new name")
+
+    def copyContentsTo(self, new_foldername):
+        return self.copy_contents_to()
+
+    def copy_to(self, new_foldername):
+        try:
+            shutil.copytree(new_foldername)
             return self
         except FileNotFoundError:
             print(f"Folder/directory {self.foldername} does not exist at that directory")
@@ -112,24 +106,8 @@ class folder:
             print("Enter a new directory, including the new name")
 
     def copyTo(self, new_foldername):
-        try:
-            if not os.path.isdir(new_foldername):
-                print(f"{new_foldername} path does not exist. Create a folder/directory to that path before copying")
-                return self
-            files = os.listdir(self.foldername)
-            for file in files:
-                if os.path.isfile(os.path.join(self.foldername, file)):
-                    shutil.copy(os.path.join(self.foldername, file), new_foldername)
-                elif os.path.isdir(os.path.join(self.foldername, file)):
-                    shutil.copytree(os.path.join(self.foldername, new_foldername))
-            return self
-        except FileNotFoundError:
-            print(f"Folder/directory {self.foldername} does not exist at that directory")
-        except PermissionError:
-            print(f"Permission denied while copying {self.foldername}")
-        except Exception as e:
-            print(f"An error occured while copying {self.foldername} to {new_foldername}")
-            print("Enter a new directory, including the new name")
+        return self.copy_to(new_foldername)
+        
 
     def list(self):
         try:
@@ -145,7 +123,7 @@ class folder:
     def replace(self, folder_to_replace):
         try:
             folder(folder_to_replace).delete()
-            self.copy(folder_to_replace)
+            self.copy_to(folder_to_replace)
             self.foldername = folder_to_replace
             return self
         except FileNotFoundError:
@@ -171,7 +149,6 @@ class folder:
                     os.rmdir(file_path)
             return self
             
-
         except FileNotFoundError:
             print(f"Folder/directory {self.foldername} does not exist")
         except PermissionError:
@@ -184,16 +161,13 @@ class folder:
         try:
             if os.path.isdir(clear_dir):
                 if len(os.listdir(clear_dir)) == 0:
-                    return self
-
-            files = os.listdir(clear_dir)
-            for file in files:
-                file_path = os.path.join(clear_dir, file)
-                if os.path.isfile(file_path):
-                    os.remove(file_path)
-                if os.path.isdir(file_path):
-                    os.rmdir(file_path)
-            
+                    files = os.listdir(clear_dir)
+                    for file in files:
+                        file_path = os.path.join(clear_dir, file)
+                        if os.path.isfile(file_path):
+                            os.remove(file_path)
+                        if os.path.isdir(file_path):
+                            os.rmdir(file_path)
         except FileNotFoundError:
             print(f"Folder/directory {clear_dir} does not exist")
         except PermissionError:
@@ -201,6 +175,21 @@ class folder:
         except Exception as e:
             print(f"An error occurred while clearing {clear_dir}")
     
+    @staticmethod
+    def mkdir(directory):
+        folder(directory).make()
+
+    def move_to(self, new_location):
+        if os.path.isfile(new_location):
+            return self
+        temp = self.foldername
+        self.copy_to(new_location)
+        self.foldername = temp
+        self.delete()
+        return self
+    
+    def moveTo(self, new_location):
+        return self.move_to(new_location)
 
     def make_file(self, filename):
         try:
@@ -215,16 +204,8 @@ class folder:
             print(f"An error occurred while making {filename}")
 
     def create_file(self, filename):
-        try:
-            f = open(self.foldername + filename, 'w')
-            f.close()
-            return self
-        except FileNotFoundError:
-            print(f"Folder/directory {self.foldername} does not exist")
-        except PermissionError:
-            print(f"Permission denied while making {filename}")
-        except Exception as e:
-            print(f"An error occurred while making {filename}")
+        self.make_file()
+        return self
 
     def get_foldername(self):
         try:
