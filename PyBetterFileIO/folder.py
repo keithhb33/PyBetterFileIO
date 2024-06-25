@@ -95,14 +95,19 @@ class folder:
 
     def copy_to(self, new_foldername):
         try:
-            shutil.copytree(new_foldername)
+            if not (new_foldername.strip().replace("/", "").replace("\\", "").endswith(self.foldername)):
+                shutil.copytree(self.foldername, os.path.join(new_foldername, self.foldername))
+            else:
+                shutil.copytree(self.foldername, new_foldername)
             return self
         except FileNotFoundError:
             print(f"Folder/directory {self.foldername} does not exist at that directory")
         except PermissionError:
             print(f"Permission denied while copying {self.foldername}")
         except Exception as e:
-            print(f"An error occured while copying {self.foldername} to {new_foldername}")
+            if "Cannot create a file when that file already exists" in str(e):
+                return self
+            print(f"An error occured while copying {self.foldername} to {new_foldername}: {e}")
             print("Enter a new directory, including the new name")
 
     def copyTo(self, new_foldername):
@@ -122,7 +127,10 @@ class folder:
 
     def replace(self, folder_to_replace):
         try:
-            folder(folder_to_replace).delete()
+            try:
+                folder(folder_to_replace).delete()
+            except Exception as e:
+                pass
             self.copy_to(folder_to_replace)
             self.foldername = folder_to_replace
             return self
