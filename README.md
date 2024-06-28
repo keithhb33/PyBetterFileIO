@@ -211,3 +211,19 @@ with open('file.txt', 'w') as file:
 ```python
 file("file.txt").replace("abcd", "ram")
 ```
+
+<h2>Copy Contents of a Folder</h2>
+
+<h3>Default Python</h3>
+
+```python
+files = os.listdir("contents")
+for file in files:
+  shutil.copy(os.path.join("contents", file), os.path.join("other_content", "test_folder", file))
+```
+
+<h3>PyBetterFileIO</h3>
+
+```python
+folder("contents").copy_contents_to("other_content/test_folder")
+```
