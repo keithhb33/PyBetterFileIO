@@ -3,7 +3,7 @@ import os
 import shutil
 from pathlib import Path
 
-class folder:
+class Folder:
 
     def __init__(self, foldername):
         if "." not in foldername:
@@ -13,9 +13,9 @@ class folder:
 
     def exists(self):
         try:
-            return os.path.isdir(self.filename)
+            return os.path.isdir(self.foldername)
         except Exception as e:
-            print(f"An error occured checking if {self.filename} exists")
+            print(f"An error occured checking if {self.foldername} exists")
 
     def rename(self, new_foldername):
         try:
@@ -128,7 +128,7 @@ class folder:
     def replace(self, folder_to_replace):
         try:
             try:
-                folder(folder_to_replace).delete()
+                Folder(folder_to_replace).delete()
             except Exception as e:
                 pass
             self.copy_to(folder_to_replace)
@@ -185,7 +185,7 @@ class folder:
     
     @staticmethod
     def mkdir(directory):
-        folder(directory).make()
+        Folder(directory).make()
 
     def move_to(self, new_location):
         if os.path.isfile(new_location):
