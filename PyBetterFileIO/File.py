@@ -2,7 +2,7 @@ import os
 import shutil
 from pathlib import Path
 
-class file:
+class File:
 
     def __init__(self, filename):
         if "." not in filename:
@@ -12,12 +12,8 @@ class file:
         elif type(filename) == "_io.TextIOWrapper":
             self.filename = os.path.join(os.path.dirname(self), os.path.basename(self))
 
-
     def exists(self):
-        #try:
         return os.path.isfile(self.filename)
-        #except Exception as e:
-        #    print(f"An error occured checking if {self.filename} exists")
 
     def rename(self, new_filename):
         try:
@@ -134,14 +130,14 @@ class file:
     def move_to(self, new_location):
         try:
             if ("." in new_location and "." != new_location[0] and "." != new_location[1] and len(new_location) > 2) or (new_location[0] == "." and not "." in new_location[1:]):
-                if file(new_location).exists():
-                    file(new_location).delete()
+                if File(new_location).exists():
+                    File(new_location).delete()
                 shutil.move(self.filename, new_location)
                 self.filename = new_location
             else:
                 path = os.path.join(new_location, self.filename)
-                if file(path).exists():
-                    file(path).delete()
+                if File(path).exists():
+                    File(path).delete()
                 shutil.move(self.filename, path)
                 self.filename = path            
             return self
@@ -213,13 +209,13 @@ class file:
     def copy_to(self, new_location):
         try:
             if ("." in new_location and "." != new_location[0] and "." != new_location[1] and len(new_location) > 2) or (new_location[0] == "." and not "." in new_location[1:]):
-                if file(new_location).exists():
-                    file(new_location).delete()
+                if File(new_location).exists():
+                    File(new_location).delete()
                 shutil.copyfile(self.filename, new_location)
             else:
                 path = os.path.join(new_location, self.filename)
-                if file(path).exists():
-                    file(path).delete()
+                if File(path).exists():
+                    File(path).delete()
                 shutil.copy(self.filename, path)
             return self
         except FileNotFoundError:
@@ -242,11 +238,11 @@ class file:
     @staticmethod
     def get_custom_file_object(input_file):
         path = os.path.join(os.path.dirname(input_file.name), os.path.basename(input_file.name))
-        return file(path)
+        return File(path)
 
     @staticmethod
     def getCustomFileObject(input_file):
-        return file.get_custom_file_object(input_file)
+        return File.get_custom_file_object(input_file)
 
     def clear(self):
         try:
@@ -259,13 +255,3 @@ class file:
             print(f"Permission denied while clearing {self.outer_instance.filename}")
         except Exception as e:
             print(f"An error occurred while clearing {self.outer_instance.filename}")
-
-        
-
-
-
-            
-            
-
-
-    
