@@ -75,7 +75,7 @@ new_file.replace("Hello World!", "Goodbye World!") # Finds and replaces file's c
 new_file.move_to("folder_or_path_to_move_to.optional") # Moves file to specified location
 ```
 ```python
-new_file.rename("folder_to_move_to/old_file.txt") # Rename the file
+new_file.rename("file.txt", "folder_to_move_to/file.txt") # Rename the file
 ```
 ```python
 new_file.delete() # Delete the file
